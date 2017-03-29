@@ -5,25 +5,29 @@
 
 #include "cJSON.h"
 #include "flow_report.h"
-char bufx[4096];
+char bufx[40096];
 
 char* process_json_data(cJSON* json_data)
 {
-	cJSON* json_value;
-	int result, error_code;
-	char *error_msg;
+	int i;
+	cJSON* json_value, *item, *array_item;
+	char *result, *error_code, *error_msg;
+	if(!json_data)
+	{
+		return "false";
+	}
 	for(json_value = json_data->child; json_value; json_value = json_value->next)
 	{
 		if(json_value->type != cJSON_String)
             continue;
-        if(!strcmp(json_value->string, "result"))
-            result = json_value->valueint;
+        if(!strcmp(json_value->string, "process"))
+          	result = json_value->valuestring;
 		if(!strcmp(json_value->string, "error_code"))
-            error_code = json_value->valueint;
+            error_code = json_value->valuestring;
 		if(!strcmp(json_value->string, "error_msg"))
             error_msg = json_value->valuestring;
 	}
-	if (result == 1)
+	if( !strcmp(result, "1"))
 		return "success";
 	else
 		return "false";
@@ -32,7 +36,6 @@ char* process_json_data(cJSON* json_data)
 
 char* curl(char* data, char* address)
 {
-puts(data);
 	FILE *fp;
 	char *stri, fc;
 	sprintf(bufx, "curl --data '%s' \"%s\"", data, address);
@@ -53,7 +56,7 @@ cJSON* switch_to_json( traffic_data* rtc )
 	FILE *fpid;
 	struct timeval tv;
 	cJSON *json, *json_data, *jsoni, *json_tmp, *data;
-        traffic_data *ri = rtc;
+    traffic_data *ri = rtc;
 	long timems;
 	int times;
 	char  stri[17];
@@ -69,14 +72,12 @@ cJSON* switch_to_json( traffic_data* rtc )
 		fclose(fpid);
 
 	}
-    json = cJSON_CreateArray();
-	json_data = cJSON_CreateObject();
-	cJSON_AddItemToArray(json, json_data);
-	cJSON_AddNumberToObject(json_data, "task_id", timems);
-	cJSON_AddStringToObject(json_data, "device_serial_number", stri);
-	cJSON_AddNumberToObject(json_data, "data_time", times);
-	cJSON_AddItemToObject(json_data, "device_port_traffic", json_tmp = cJSON_CreateArray());
-    
+    json = cJSON_CreateObject();
+	cJSON_AddItemToObject(json, "task_id", cJSON_CreateNumber(times));
+	cJSON_AddItemToObject(json, "device_serial_number", cJSON_CreateString(stri));
+	cJSON_AddItemToObject(json, "data_time", cJSON_CreateNumber(times));
+	cJSON_AddItemToObject(json, "device_port_traffic", json_tmp=cJSON_CreateArray());
+	
 	while(ri  != NULL)
     {
 		jsoni = cJSON_CreateObject();

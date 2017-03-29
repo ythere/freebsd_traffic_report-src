@@ -10,8 +10,8 @@ int main()
 	int i;
 	cJSON *json_curl, *json_data;
 	char *result_str;
-    char *result;
-    char *analysis_result;
+    	char *result;
+    	char *analysis_result;
 	traffic_data *rtc = (traffic_data*)malloc(sizeof(traffic_data));
 	rtc->next = NULL;
 	rtc->name = NULL;
@@ -23,21 +23,17 @@ int main()
 	{
 		rtc = process_network( card_name[i], rtc );
 	}
-rtc = rtc->next;
+	rtc = rtc->next;
 	
 	json_data = switch_to_json(rtc);
-puts("switch end");
 	result_str = cJSON_Print(json_data);
-puts("curl begin");
-	result = curl( result_str, "ip" ); //暂定是否有返回值
-	
-puts("curl end");
+	result = curl( result_str, "http://192.168.2.188:8080/vpnboss/vbox_device_traffic_realtime_report" ); 
 	json_curl = cJSON_Parse(result);
 	analysis_result = process_json_data(json_curl);
-	
 	if (strcmp(analysis_result,"success") == 0)
 		return 0;
 	else 
 		return 1;
 	
 }
+

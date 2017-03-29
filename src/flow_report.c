@@ -56,7 +56,7 @@ cJSON* switch_to_json( traffic_data* rtc )
 	FILE *fpid;
 	struct timeval tv;
 	cJSON *json, *json_data, *jsoni, *json_tmp, *data;
-    traffic_data *ri = rtc;
+    	traffic_data *ri = rtc;
 	long timems;
 	int times;
 	char  stri[17];
@@ -72,22 +72,22 @@ cJSON* switch_to_json( traffic_data* rtc )
 		fclose(fpid);
 
 	}
-    json = cJSON_CreateObject();
+    	json = cJSON_CreateObject();
 	cJSON_AddItemToObject(json, "task_id", cJSON_CreateNumber(times));
 	cJSON_AddItemToObject(json, "device_serial_number", cJSON_CreateString(stri));
 	cJSON_AddItemToObject(json, "data_time", cJSON_CreateNumber(times));
 	cJSON_AddItemToObject(json, "device_port_traffic", json_tmp=cJSON_CreateArray());
 	
 	while(ri  != NULL)
-    {
+    	{
 		jsoni = cJSON_CreateObject();
 		cJSON_AddItemToArray(json_tmp, jsoni);
 		cJSON_AddStringToObject(jsoni, "port_device_name", ri->name);
 		cJSON_AddStringToObject(jsoni, "upstream_traffic", ri->upstream );
 		cJSON_AddStringToObject(jsoni, "downstream_traffic", ri->downstream);
 		ri = ri->next;
-    }
-    return json;
+    	}
+    	return json;
 }
 
 traffic_data* process_network( char *name, traffic_data* rtc )
@@ -108,13 +108,12 @@ traffic_data* process_network( char *name, traffic_data* rtc )
 	this->name = namebuf;
 	this->next = NULL;
 	
-/* Traffic down */	
+	/* Traffic down */	
 	sprintf(cmd, "expr `netstat -i -b -n -I %s | grep %s | awk -F %s '{print $8}' | head -1` - `cat /vbox/config/traffic/down_latest/%s` >> /vbox/config/traffic/down_history/%s", namebuf, namebuf, tmpch, namebuf, namebuf );
 	puts(cmd);
 	system(cmd);
 	
 	sprintf(filecmd, "/vbox/config/traffic/down_history/%s", namebuf);
-	//memset(cmd, 0, sizeof(cmd));
 	sprintf(cmd, "netstat -i -b -n -I %s | grep %s | awk -F %s '{print $8}' | head -1 > /vbox/config/traffic/down_latest/%s", namebuf, namebuf, tmpch, namebuf);
 	system(cmd);
 	
@@ -151,7 +150,7 @@ traffic_data* process_network( char *name, traffic_data* rtc )
 	
 	
 	
-/* Traffic up */
+	/* Traffic up */
 	memset(cmd, 0, sizeof(cmd));
 	sprintf(cmd, "expr `netstat -i -b -n -I %s | grep %s | awk -F %s '{print $11}' | head -1` - `cat /vbox/config/traffic/up_latest/%s` >> /vbox/config/traffic/up_history/%s", namebuf, namebuf, tmpch, namebuf, namebuf );
 	system(cmd);
